@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="claro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disponibilidad de insumos en sanitarios de la FIEC · Resultados</title>
+  <meta name="description" content="Resultados de la medición presencial de agua, papel y jabón en los sanitarios de la planta alta del Edificio A de la FIEC (UV, Poza Rica-Tuxpan).">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <!-- Navegación fija por secciones -->
+  <header class="barra">
+    <nav aria-label="Secciones de la página">
+      <ul class="menu">
+        <li><a href="#resumen">Resumen</a></li>
+        <li><a href="#clasificacion">Clasificación</a></li>
+        <li><a href="#espaciotemporal">Espacio-temporal</a></li>
+        <li><a href="#estadisticas-sec">Estadísticas</a></li>
+        <li><a href="#comprobacion">Hipótesis</a></li>
+        <li><a href="#investigacion">Investigación</a></li>
+        <li><a href="#transparencia">Datos</a></li>
+        <li><a href="#metodologia">Metodología</a></li>
+      </ul>
+    </nav>
+    <button type="button" id="btn-tema" class="btn btn-sec" aria-pressed="false">☾ Modo oscuro</button>
+  </header>
+
+  <main id="contenido">
+    <!-- 1. Encabezado -->
+    <section class="portada" aria-labelledby="titulo-proyecto">
+      <p id="etiqueta-datos" class="etiqueta-datos es-real" role="status">DATOS REALES</p>
+      <h1 id="titulo-proyecto"></h1>
+      <dl class="ficha">
+        <div><dt>Equipo</dt><dd>Miguel Ángel Morales Hernández y Elonin Jireh Morales Nochebuena</dd></div>
+        <div><dt>Docente</dt><dd>Alfredo Cristóbal Salas</dd></div>
+        <div><dt>Curso</dt><dd>Investigación Aplicada a las Tecnologías Computacionales</dd></div>
+        <div><dt>Periodo</dt><dd>Octubre-noviembre de 2026 · <span id="periodo-datos"></span></dd></div>
+        <div><dt>Institución</dt><dd>Universidad Veracruzana, región Poza Rica-Tuxpan · Facultad de Ingeniería Electrónica y Comunicaciones (FIEC)</dd></div>
+      </dl>
+      <p id="detalle-datos" class="nota"></p>
+
+      <!-- Carga de datos -->
+      <div id="errores-carga" class="aviso" hidden></div>
+      <div id="bloque-cargar" class="cargar" hidden>
+        <p id="aviso-fetch" class="nota" hidden>No se pudo leer <code>data/matriz_maestra.csv</code> (por ejemplo, al abrir el archivo directo desde el disco). Mientras no se cargue otro CSV se muestra la copia de respaldo de los datos incluida en la página.</p>
+        <label class="btn" for="archivo-csv">Cargar CSV</label>
+        <input id="archivo-csv" class="oculto-visual" type="file" accept=".csv,text/csv">
+      </div>
+    </section>
+
+    <!-- 2. Resumen ejecutivo -->
+    <section id="resumen" aria-labelledby="h-resumen">
+      <h2 id="h-resumen">Resumen ejecutivo</h2>
+      <div id="tarjetas" class="tarjetas"></div>
+    </section>
+
+    <!-- 3. Clasificación -->
+    <section id="clasificacion" aria-labelledby="h-clasif">
+      <h2 id="h-clasif">Clasificación de resultados</h2>
+      <p>Los niveles se asignan según el IDSI. Los umbrales son <strong>un criterio propuesto por el equipo</strong> y pueden editarse en las constantes <code>NIVELES</code> de <code>js/app.js</code>.</p>
+      <ul id="leyenda-niveles" class="leyenda" aria-label="Niveles de clasificación"></ul>
+      <div class="dos-col">
+        <div id="clasif-sanitarios"></div>
+        <div id="clasif-franjas"></div>
+      </div>
+      <div id="clasif-global"></div>
+      <h3>Franjas más vulnerables</h3>
+      <p>Ranking por λ(h): faltas promedio por día en cada franja, sumando agua, papel y jabón; en empate, la franja con menor IDSI.</p>
+      <div id="ranking"></div>
+    </section>
+
+    <!-- 4. Espacio-temporal -->
+    <section id="espaciotemporal" aria-labelledby="h-esp">
+      <h2 id="h-esp">Análisis espacio-temporal</h2>
+      <div id="mapa-calor"></div>
+      <div id="tabla-espacio"></div>
+      <div class="graficas">
+        <figure><div class="lienzo"><canvas id="g1" role="img" aria-label="Gráfica de barras: porcentaje de carencia por insumo"></canvas></div><div id="t1"></div></figure>
+        <figure><div class="lienzo"><canvas id="g2" role="img" aria-label="Gráfica de barras: IDSI por franja horaria"></canvas></div><div id="t2"></div></figure>
+        <figure><div class="lienzo"><canvas id="g3" role="img" aria-label="Gráfica de barras agrupadas: Hombres frente a Mujeres"></canvas></div><div id="t3"></div></figure>
+        <figure><div class="lienzo"><canvas id="g4" role="img" aria-label="Gráfica de líneas: IDSI por día"></canvas></div><div id="t4"></div></figure>
+      </div>
+    </section>
+
+    <!-- 5. Estadísticas -->
+    <section id="estadisticas-sec" aria-labelledby="h-est">
+      <h2 id="h-est">Estadísticas</h2>
+      <p>Para cada variable se toman 10 mediciones: el porcentaje diario de disponibilidad por sanitario (5 días × 2 sanitarios). El <em>error absoluto</em> es el error estándar de la media (DE/√n) y el <em>error relativo</em> es el error absoluto dividido entre la media. Los casos atípicos siguen la regla de 1.5 veces el rango intercuartílico. Las pruebas usan α = 0.05.</p>
+      <div id="tendencia"></div>
+      <div id="estadisticas"></div>
+    </section>
+
+    <!-- 6. Comprobación de hipótesis -->
+    <section id="comprobacion" aria-labelledby="h-hip">
+      <h2 id="h-hip">Comprobación de hipótesis</h2>
+      <div id="hipotesis"></div>
+    </section>
+
+    <!-- 7. Clasificación de la investigación -->
+    <section id="investigacion" aria-labelledby="h-inv">
+      <h2 id="h-inv">Clasificación de la investigación</h2>
+      <table class="tabla-resp">
+        <caption>Características metodológicas del estudio</caption>
+        <thead><tr><th scope="col">Rasgo</th><th scope="col">Descripción</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Rasgo">Tipo de investigación</td><td data-label="Descripción">Aplicada</td></tr>
+          <tr><td data-label="Rasgo">Alcance</td><td data-label="Descripción">Descriptivo</td></tr>
+          <tr><td data-label="Rasgo">Enfoque</td><td data-label="Descripción">Cuantitativo</td></tr>
+          <tr><td data-label="Rasgo">Técnica</td><td data-label="Descripción">Observación directa y medición presencial por los investigadores, sin manipular el entorno</td></tr>
+          <tr><td data-label="Rasgo">Instrumento</td><td data-label="Descripción">Lista de cotejo binaria (Sí = 1, No = 0 para agua, papel y jabón)</td></tr>
+          <tr><td data-label="Rasgo">Unidad de análisis</td><td data-label="Descripción">Cada inspección (registro) de un módulo sanitario en una ronda: 2 módulos sanitarios de la planta alta del Edificio A de la FIEC</td></tr>
+          <tr><td data-label="Rasgo">Periodo</td><td data-label="Descripción">Octubre-noviembre de 2026; registros cada 2 horas de 8:00 a 14:00 durante 5 días</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 8. Transparencia y descarga -->
+    <section id="transparencia" aria-labelledby="h-tr">
+      <h2 id="h-tr">Transparencia y descarga</h2>
+      <div class="filtros" role="group" aria-label="Filtros de la matriz">
+        <label>Sanitario
+          <select id="f-sanitario"><option value="">Todos</option><option>Hombres</option><option>Mujeres</option></select>
+        </label>
+        <label>Franja horaria
+          <select id="f-franja"><option value="">Todas</option><option>08:00</option><option>10:00</option><option>12:00</option><option>14:00</option></select>
+        </label>
+        <label>Día
+          <select id="f-dia"><option value="">Todos los días</option></select>
+        </label>
+      </div>
+      <div class="acciones">
+        <button type="button" id="btn-exportar" class="btn">Exportar CSV</button>
+        <label class="interruptor"><input type="checkbox" id="exportar-completa"> Exportar la matriz completa (ignorar filtros)</label>
+        <button type="button" id="btn-exportar-ind" class="btn btn-sec">Exportar indicadores (.csv)</button>
+      </div>
+      <p id="conteo-matriz" class="nota" aria-live="polite"></p>
+      <div id="matriz"></div>
+      <h3>Diccionario de datos</h3>
+      <div id="diccionario"></div>
+    </section>
+
+    <!-- 9. Metodología y referencias -->
+    <section id="metodologia" aria-labelledby="h-met">
+      <h2 id="h-met">Metodología y referencias</h2>
+      <h3>Fórmulas del protocolo (Módulo VI, sección 6.2)</h3>
+      <ul class="formulas">
+        <li><strong>V(k,j)</strong> = 1 si el insumo k estaba disponible en la inspección j, y 0 si no; k ∈ {agua, papel, jabón}.</li>
+        <li><strong>f(k)</strong> = Σ<sub>j=1</sub><sup>n</sup> (1 − V(k,j)), donde n es el conjunto de inspecciones considerado.</li>
+        <li><strong>h(k)</strong> = f(k) / N, donde N es el total de inspecciones válidas.</li>
+        <li><strong>P(k)</strong> = h(k) × 100.</li>
+        <li><strong>IDSI</strong> = [ Σ<sub>j=1</sub><sup>N</sup> ( V(agua,j) · V(papel,j) · V(jabón,j) ) / N ] × 100.</li>
+        <li><strong>λ(h)</strong> = [ Σ<sub>d=1</sub><sup>D</sup> f(k,h,d) ] / D, con D = 5 días y h ∈ {08:00, 10:00, 12:00, 14:00}.</li>
+      </ul>
+      <h3>Flujo ETL</h3>
+      <ol>
+        <li><strong>Extracción:</strong> las mediciones presenciales se capturan en Google Forms/Sheets y se reúnen en Excel; la página solo lee el archivo <code>matriz_maestra.csv</code>.</li>
+        <li><strong>Transformación:</strong> al cargar el CSV se validan las columnas, los valores 0/1, las fechas y las horas; los registros incompletos o inválidos se excluyen y se ajusta N. Después se calculan f(k), h(k), P(k), IDSI y λ(h).</li>
+        <li><strong>Carga:</strong> los resultados se muestran en el dashboard, las tablas y las gráficas, y pueden descargarse como CSV.</li>
+      </ol>
+      <h3>Referencias</h3>
+      <div id="referencias"></div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Página estática de difusión de resultados. No captura datos. Los cálculos se hacen en el navegador a partir del CSV.</p>
+  </footer>
+
+  <!-- Librerías con versión fija (cdnjs). Chart.js para gráficas y jStat para los p-valores. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.6/jstat.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
